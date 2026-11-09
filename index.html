@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb"><title>SpendSmart — make your money make sense</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard"><span class="brand-mark">S<span>+</span></span><span class="brand-name">spendsmart<span class="brand-ai">AI</span></span></a>
+      <div class="workspace"><span class="avatar">A</span><span><b>Amulya's space</b><small>Personal finances</small></span><span class="chevron">⌄</span></div>
+      <div class="nav-caption">WORKSPACE</div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#dashboard" data-page="dashboard"><span class="nav-icon">▦</span>Overview</a>
+        <a href="#transactions" data-page="transactions"><span class="nav-icon">↗</span>Transactions</a>
+        <a href="#budgets" data-page="budgets"><span class="nav-icon">◉</span>Budgets</a>
+        <a href="#goals" data-page="goals"><span class="nav-icon">◎</span>Savings goals</a>
+        <div class="nav-caption nav-caption-gap">SMART TOOLS</div>
+        <a href="#insights" data-page="insights"><span class="nav-icon">✳</span>Smart insights<span class="nav-badge">3</span></a>
+        <a href="#doctor" data-page="doctor"><span class="nav-icon">✦</span>Money Doctor<span class="nav-ai">AI</span></a>
+        <a href="#multiverse" data-page="multiverse"><span class="nav-icon">◈</span>Money Multiverse</a>
+        <a href="#future" data-page="future"><span class="nav-icon">⌁</span>Future Me</a>
+      </nav>
+      <div class="sidebar-bottom"><div class="budget-mini"><div class="mini-heading"><span>This month</span><span>↗</span></div><b id="sideBudgetSpent">₹0</b><span id="sideBudgetLimit">of ₹0 monthly budget</span><div class="mini-track"><i id="sideBudgetBar"></i></div><small id="sideBudgetRemaining">₹0 left to spend</small></div>
+        <a href="#settings" data-page="settings" class="settings-link"><span class="nav-icon">⚙</span>Settings & reports</a>
+        <div class="profile"><span class="avatar profile-avatar">A</span><span><b>Amulya</b><small>Free plan</small></span></div>
+      </div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><button class="mobile-menu" id="menuToggle" aria-label="Toggle navigation">☰</button><div class="breadcrumbs"><span>Workspace</span><span class="crumb-sep">/</span><b id="crumbCurrent">Overview</b></div><div class="top-actions"><span class="demo-chip"><i></i> Demo workspace</span><button class="icon-button" id="exportBtn" title="Export transactions">⇩</button><span class="top-avatar">A</span></div></header>
+      <div id="pageContent" class="page-content"></div>
+    </main>
+  </div>
+  <div id="modalRoot"></div><div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body></html>
