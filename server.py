@@ -243,6 +243,82 @@ def train_category_model(transactions: list[dict], description: str) -> dict:
     }
 
 
+def model_demonstration() -> dict:
+    """Run a reproducible, clearly synthetic holdout demo of both backend models."""
+    examples = {
+        "Food": ["campus cafe", "coffee house", "lunch meals", "grocery market", "pizza restaurant", "dinner cafe", "bakery bread", "tea snacks", "fresh cafe", "canteen lunch"],
+        "Transport": ["metro card", "city bus", "taxi ride", "auto fare", "train ticket", "bus pass", "metro travel", "cab ride", "local metro", "fuel taxi"],
+        "Shopping": ["clothing store", "online shopping", "shoe shop", "mall purchase", "book store", "electronics shop", "market clothes", "online order", "gift online", "mall clothing"],
+        "Education": ["course books", "class notes", "study materials", "college tuition", "learning course", "school supplies", "exam guide", "library books", "exam course", "library study"],
+    }
+    training: list[dict] = []
+    held_out: list[dict] = []
+    for category, descriptions in examples.items():
+        for index, merchant in enumerate(descriptions):
+            target = held_out if index in {8, 9} else training
+            target.append({
+                "id": f"demo-{category.lower()}-{index}",
+                "type": "expense", "amount": 100 + 25 * index,
+                "category": category, "date": "2026-11-01", "merchant": merchant,
+            })
+
+    correct = 0
+    per_class: dict[str, dict[str, int]] = {}
+    for item in held_out:
+        result = train_category_model(training, item["merchant"])
+        predicted = result.get("suggestion")
+        per_class.setdefault(item["category"], {"correct": 0, "total": 0})
+        per_class[item["category"]]["total"] += 1
+        if predicted == item["category"]:
+            correct += 1
+            per_class[item["category"]]["correct"] += 1
+
+    # A controlled numeric sample has one intentionally injected outlier.
+    anomaly_rows: list[dict] = []
+    anomaly_categories = ["Food", "Transport", "Shopping", "Education"]
+    for index in range(48):
+        category = anomaly_categories[index % len(anomaly_categories)]
+        amount = 120 + ((index * 73) % 480)
+        anomaly_rows.append({
+            "id": f"demo-normal-{index}", "type": "expense", "amount": amount,
+            "category": category, "date": "2026-11-01", "merchant": f"Sample {category.lower()} {index}",
+        })
+    anomaly_rows.append({
+        "id": "demo-injected-outlier", "type": "expense", "amount": 12500,
+        "category": "Food", "date": "2026-11-01", "merchant": "Injected demo outlier",
+    })
+    anomaly_result = anomaly_insights(anomaly_rows)
+    detected = any(item["id"] == "demo-injected-outlier" for item in anomaly_result.get("items", []))
+
+    total = len(held_out)
+    return {
+        "dataset": "Synthetic classroom example; deterministic and contains no personal data.",
+        "category_model": {
+            "algorithm": "Multinomial Naive Bayes",
+            "features": "Merchant/description word tokens",
+            "training_samples": len(training),
+            "test_samples": total,
+            "classes": list(examples),
+            "accuracy": round(correct / total, 4) if total else 0,
+            "correct": correct,
+            "per_class": per_class,
+            "example": train_category_model(training, "coffee cafe"),
+        },
+        "anomaly_model": {
+            "algorithm": "Isolation Forest (48 randomized trees)",
+            "features": "Log expense amount and log amount/category-median ratio",
+            "samples": len(anomaly_rows),
+            "injected_outlier_amount": 12500,
+            "injected_outlier_ranked_in_top_three": detected,
+            "top_results": [
+                {"merchant": row["merchant"], "category": row["category"], "amount": row["amount"], "score": row["score"]}
+                for row in anomaly_result.get("items", [])
+            ],
+            "evaluation_note": "One injected outlier is a demonstration check, not a representative accuracy estimate.",
+        },
+    }
+
+
 def c_factor(n: int) -> float:
     if n <= 1:
         return 0.0
@@ -343,6 +419,8 @@ class SpendSmartHandler(SimpleHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_GET(self) -> None:
+        if urlsplit(self.path).path == "/api/ml/demo":
+            return self.send_json(200, model_demonstration())
         if urlsplit(self.path).path == "/api/status":
             config = settings()
             return self.send_json(200, {

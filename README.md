@@ -18,6 +18,10 @@ Money Doctor uses OpenAI’s Responses API. Create a local `.env` file by copyin
 
 Before the first question in each browser tab session, the app asks for consent to send the question, recent chat history, recent transaction dates, merchants, categories and amounts, budgets, and goals to OpenAI. Transaction notes and API keys are not sent. The key stays on the local server. If no key is configured, Money Doctor shows a setup message and does not produce a simulated answer.
 
+## Show the backend model
+
+Start the server, open **Smart insights**, then select **Run model demo**. The page displays the algorithms, feature inputs, train/test sizes, hold-out result, and a controlled anomaly check. See [MODEL_DEMO.md](MODEL_DEMO.md) for a presentation walkthrough, algorithm details, API map, and honest limitations. For a direct JSON response, open <http://127.0.0.1:8001/api/ml/demo>. The live APIs are `/api/ml/category` and `/api/ml/anomalies`; the reproducible classroom demonstration is `/api/ml/demo`.
+
 ## What works
 
 - Dashboard totals, spending charts, transaction editing, search, filters, and CSV export
@@ -29,4 +33,4 @@ Before the first question in each browser tab session, the app asks for consent 
 - Interactive purchase scenarios and a clearly labeled straight-line baseline projection
 - Mobile layout and local data reset/deletion
 
-The ML models train from the current saved transaction history and report when there is too little data. Demo records are synthetic and may be used as training examples until removed. No transaction database or login is included; each browser has its own local data. The app is an educational prototype, not a financial adviser.
+The live ML features train from the current saved transaction history and report when there is too little data. The Smart Insights page also has a **Run model demo** button for a reproducible backend walkthrough: it trains Multinomial Naive Bayes on 32 synthetic labeled examples, evaluates 8 held-out examples, and runs the Isolation Forest against 49 synthetic expenses including one injected outlier. It reports per-class counts, hold-out accuracy, the example prediction, and whether the injected outlier reaches the top three. These are small classroom demonstration results, not production performance claims, and use no personal data. Demo records in the normal app are synthetic and may be used as live training examples until removed. No transaction database or login is included; each browser has its own local data. The app is an educational prototype, not a financial adviser.
